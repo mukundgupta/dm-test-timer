@@ -6,11 +6,11 @@
     <title>Intimidating Countdown Timer</title>
     <style>
       :root {
-        --bg: #070608;
-        --accent: #ff1e1e;
-        --danger: #ff3b3b;
+        --bg: #0b0b0d;
+        --glow: #ff1e1e;
         --muted: #b8b8c0;
-        --ok: #1fc063;
+        --danger: #ff3b3b;
+        --safe: #3bff3b;
       }
       * {
         box-sizing: border-box;
@@ -23,41 +23,27 @@
           "Helvetica Neue", Arial;
       }
       body {
-        background: radial-gradient(ellipse at center, #0c0c10 0%, #050506 60%),
+        background: radial-gradient(ellipse at center, #0f0f12 0%, #050506 60%),
           var(--bg);
         color: #fff;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        flex-direction: column;
+        gap: 40px;
       }
 
-      /* container */
-      .stage {
-        width: min(880px, 92vw);
-        max-width: 880px;
-        padding: 28px;
-        border-radius: 18px;
-        position: relative;
+      .timer-wrap {
+        width: min(420px, 90vw);
+        aspect-ratio: 1;
         display: flex;
-        flex-direction: column;
         align-items: center;
-        gap: 18px;
-      }
-
-      /* the ring */
-      .ring-wrap {
-        width: min(520px, 78vw);
-        height: min(520px, 78vw);
-        max-width: 520px;
-        border-radius: 50%;
-        display: grid;
-        place-items: center;
+        justify-content: center;
         position: relative;
       }
       .ring {
-        width: 92%;
-        height: 92%;
+        width: 100%;
+        height: 100%;
         border-radius: 50%;
         display: grid;
         place-items: center;
@@ -66,13 +52,13 @@
           var(--danger) 0deg,
           rgba(255, 255, 255, 0.03) 0deg
         );
-        transition: background 0.25s linear, box-shadow 0.25s linear;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8),
-          inset 0 0 90px rgba(255, 0, 0, 0.03);
+        transition: background 0.25s linear;
+        box-shadow: 0 0 60px rgba(255, 0, 0, 0.06),
+          0 10px 30px rgba(0, 0, 0, 0.6);
       }
       .face {
-        width: 80%;
-        height: 80%;
+        width: 78%;
+        height: 78%;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -81,33 +67,23 @@
         background: radial-gradient(
             circle at 20% 20%,
             rgba(255, 255, 255, 0.02),
-            transparent 18%
+            transparent 20%
           ),
-          linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7));
+          linear-gradient(180deg, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.6));
         border: 6px solid rgba(255, 255, 255, 0.02);
         position: relative;
         overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
       }
-
       .time {
-        font-size: clamp(48px, 9vw, 140px);
-        line-height: 0.85;
+        font-size: clamp(48px, 12vw, 120px);
         font-weight: 800;
         letter-spacing: -4px;
-        color: var(--accent);
-        text-shadow: 0 0 24px rgba(255, 30, 30, 0.85),
-          0 2px 14px rgba(0, 0, 0, 0.85);
-        transform-origin: center;
-      }
-      .label {
-        font-size: 14px;
-        color: var(--muted);
-        margin-top: 6px;
-        letter-spacing: 1px;
+        color: var(--glow);
+        text-shadow: 0 0 18px rgba(255, 30, 30, 0.75),
+          0 2px 10px rgba(0, 0, 0, 0.8);
       }
 
-      /* effects */
+      /* Effects */
       .pulse {
         animation: heartbeat 1s infinite;
       }
@@ -128,7 +104,6 @@
           transform: scale(1);
         }
       }
-
       .shake {
         animation: shake 0.8s infinite;
       }
@@ -152,7 +127,6 @@
           transform: translateX(0);
         }
       }
-
       .glitch {
         position: relative;
       }
@@ -164,7 +138,7 @@
         top: 0;
         right: 0;
         bottom: 0;
-        opacity: 0.9;
+        opacity: 0.8;
       }
       .glitch::before {
         transform: translate(-2px, -2px);
@@ -185,121 +159,101 @@
         opacity: 0;
         pointer-events: none;
       }
-
-      /* button */
-      .controls {
-        display: flex;
-        gap: 12px;
+      .end-flash.on {
+        animation: flash 1s infinite;
       }
+      @keyframes flash {
+        0% {
+          opacity: 0;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+
       button {
-        background: linear-gradient(180deg, var(--danger), #8b0000);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        padding: 12px 22px;
-        border-radius: 10px;
-        color: #fff;
-        font-weight: 700;
+        padding: 15px 40px;
+        font-size: 1.5em;
+        font-weight: 600;
+        border-radius: 12px;
         cursor: pointer;
+        border: none;
+        transition: all 0.3s;
       }
-      button.stopped {
-        background: linear-gradient(180deg, var(--ok), #0a7a3f);
+      button.start {
+        background: linear-gradient(180deg, var(--danger), #8b0000);
+        color: white;
+        box-shadow: 0 0 25px rgba(255, 0, 0, 0.5);
+      }
+      button.stop {
+        background: linear-gradient(180deg, var(--safe), #008b00);
+        color: black;
+        box-shadow: 0 0 25px rgba(0, 255, 0, 0.5);
       }
 
-      /* state when stopped (green) */
-      .stopped .time {
-        color: var(--ok);
-        text-shadow: 0 0 18px rgba(31, 192, 99, 0.8);
+      /* green mode (when stopped) */
+      .green .time {
+        color: var(--safe);
+        text-shadow: 0 0 20px var(--safe);
       }
-      .stopped .ring {
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8),
-          inset 0 0 90px rgba(31, 192, 99, 0.03);
-      }
-      .stopped .ring {
+      .green .ring {
         background: conic-gradient(
-          var(--ok) 0deg,
+          var(--safe) 360deg,
           rgba(255, 255, 255, 0.03) 0deg
         );
       }
-
-      /* last-10s heartbeat */
-      .urgent .face {
-        animation: urgentPulse 0.6s infinite;
-      }
-      @keyframes urgentPulse {
-        0% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.04);
-        }
-        100% {
-          transform: scale(1);
-        }
-      }
-
-      @media (max-width: 720px) {
-        .stage {
-          padding: 18px;
-        }
-      }
     </style>
   </head>
-  <body id="page">
-    <div class="stage">
-      <div class="ring-wrap">
-        <div id="ring" class="ring">
-          <div id="face" class="face">
-            <div>
-              <div id="time" class="time glitch" data-text="02:00">02:00</div>
-              <div class="label">Time remaining</div>
-            </div>
-          </div>
+  <body>
+    <div class="timer-wrap">
+      <div class="ring" id="ring">
+        <div class="face" id="face">
+          <div id="time" class="time glitch" data-text="02:00">02:00</div>
         </div>
-        <div class="end-flash" id="endFlash" aria-hidden="true"></div>
       </div>
-
-      <div class="controls">
-        <button id="startBtn">Start</button>
-      </div>
+      <div class="end-flash" id="endFlash" aria-hidden="true"></div>
     </div>
 
+    <button id="toggleBtn" class="start">Start</button>
+
     <script>
-      // Elements
-      const page = document.getElementById("page");
       const timeEl = document.getElementById("time");
       const ringEl = document.getElementById("ring");
       const faceEl = document.getElementById("face");
-      const startBtn = document.getElementById("startBtn");
       const endFlash = document.getElementById("endFlash");
+      const toggleBtn = document.getElementById("toggleBtn");
 
-      // Timing
-      const TOTAL = 90; // 1 minute 30 seconds
-      let duration = TOTAL;
-      let remaining = TOTAL;
+      const DURATION = 10; // 2 minutes
+      let remaining = DURATION;
       let running = false;
       let endTime = null;
-      let raf = null;
-      let lastSec = null;
+      let rafId = null;
 
-      // Audio context (single shared)
+      // WebAudio
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       const masterGain = audioCtx.createGain();
-      masterGain.gain.value = 0.65;
+      masterGain.gain.value = 0.5;
       masterGain.connect(audioCtx.destination);
 
-      function playBeep(freq = 880, len = 0.06, type = "sine") {
+      function playBeep(freq = 880, time = 0.06, type = "sine") {
         const o = audioCtx.createOscillator();
         const g = audioCtx.createGain();
         o.type = type;
         o.frequency.value = freq;
         g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
         g.gain.exponentialRampToValueAtTime(0.8, audioCtx.currentTime + 0.01);
-        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + len);
+        g.gain.exponentialRampToValueAtTime(
+          0.0001,
+          audioCtx.currentTime + time
+        );
         o.connect(g);
         g.connect(masterGain);
         o.start();
-        o.stop(audioCtx.currentTime + len + 0.02);
+        o.stop(audioCtx.currentTime + time + 0.02);
       }
-
       function playLongAlarm() {
         const now = audioCtx.currentTime;
         const o1 = audioCtx.createOscillator();
@@ -321,44 +275,36 @@
         o2.stop(now + 2.6);
       }
 
-      // Ring visual (conic-gradient) update
-      function updateRing() {
-        const pct = Math.max(0, Math.min(1, remaining / duration));
-        const deg = pct * 360;
-        const color = page.classList.contains("stopped")
-          ? getComputedStyle(document.documentElement)
-              .getPropertyValue("--ok")
-              .trim()
-          : getRingColor();
-        ringEl.style.background = `conic-gradient(${color} ${deg}deg, rgba(255,255,255,0.03) ${deg}deg)`;
-      }
-      function getRingColor() {
-        const f = remaining / Math.max(1, duration);
-        if (f <= 0.15) return "rgb(255,50,50)";
-        if (f <= 0.33) return "rgb(255,120,80)";
-        return "rgb(255,200,80)";
-      }
-
-      // format
-      function fmt(t) {
+      function formatTime(t) {
+        t = Math.max(0, Math.ceil(t));
         const mm = Math.floor(t / 60)
           .toString()
           .padStart(2, "0");
         const ss = (t % 60).toString().padStart(2, "0");
         return `${mm}:${ss}`;
       }
+      function updateRing() {
+        const pct = Math.max(0, Math.min(1, remaining / DURATION));
+        const degrees = pct * 360;
+        const color = running ? getRingColor() : "var(--safe)";
+        ringEl.style.background = `conic-gradient(${color} ${degrees}deg, rgba(255,255,255,0.03) ${degrees}deg)`;
+      }
+      function getRingColor() {
+        const frac = remaining / DURATION;
+        if (frac <= 0.15) return "rgb(255,50,50)";
+        if (frac <= 0.33) return "rgb(255,120,80)";
+        return "rgb(255,200,80)";
+      }
 
-      // main loop using RAF for smoothness
-      function loop() {
+      let lastSecondTick = null;
+      function tick() {
         if (!running) return;
-        const now = performance.now();
-        const secsLeft = Math.max(0, (endTime - now) / 1000);
-        remaining = secsLeft;
+        const msNow = performance.now();
+        remaining = Math.max(0, (endTime - msNow) / 1000);
 
-        const curSec = Math.ceil(remaining);
-        if (curSec !== lastSec) {
-          lastSec = curSec;
-          // beep scheduling
+        const currentSecond = Math.ceil(remaining);
+        if (currentSecond !== lastSecondTick) {
+          lastSecondTick = currentSecond;
           if (remaining > 0) {
             if (remaining <= 10) {
               playBeep(1200 + (10 - remaining) * 40, 0.12, "sawtooth");
@@ -370,91 +316,61 @@
           }
         }
 
-        // update visuals
-        timeEl.textContent = fmt(Math.ceil(remaining));
+        timeEl.textContent = formatTime(remaining);
         timeEl.setAttribute("data-text", timeEl.textContent);
-
-        // low-time visuals
-        if (remaining <= 30) faceEl.classList.add("pulse");
-        else faceEl.classList.remove("pulse");
-        if (remaining <= 10) {
-          faceEl.classList.add("shake");
-          page.classList.add("urgent");
-        } else {
-          faceEl.classList.remove("shake");
-          page.classList.remove("urgent");
-        }
-
-        updateRing();
 
         if (remaining <= 0) {
           running = false;
-          timeEl.textContent = fmt(0);
-          faceEl.classList.remove("pulse", "shake");
-          page.classList.remove("running");
-          // alarm + flash
+          remaining = 0;
           playLongAlarm();
           endFlash.classList.add("on");
           setTimeout(() => endFlash.classList.remove("on"), 5200);
-          startBtn.textContent = "Start";
-          startBtn.classList.remove("stopped");
-          page.classList.add("stopped");
+          toggleBtn.textContent = "Start";
+          toggleBtn.className = "start";
+          document.body.classList.remove("green");
           return;
         }
 
-        raf = requestAnimationFrame(loop);
-      }
+        if (remaining <= 30) faceEl.classList.add("pulse");
+        else faceEl.classList.remove("pulse");
+        if (remaining <= 10) faceEl.classList.add("shake");
+        else faceEl.classList.remove("shake");
 
-      // controls
-      function start() {
-        if (audioCtx.state === "suspended") audioCtx.resume();
-        if (running) return;
-        // if previously stopped (green), switch back to running colors
-        page.classList.remove("stopped");
-        startBtn.classList.remove("stopped");
-        duration = remaining; // allow resume from where left off
-        endTime = performance.now() + remaining * 1000;
-        running = true;
-        page.classList.add("running");
-        startBtn.textContent = "Stop";
-        lastSec = null;
-        raf = requestAnimationFrame(loop);
-      }
-
-      function stop() {
-        if (!running) {
-          // currently paused/stopped -> make sure page is green
-          page.classList.add("stopped");
-          startBtn.classList.add("stopped");
-          startBtn.textContent = "Start";
-          return;
-        }
-        // stop (pause) timer
-        running = false;
-        if (raf) cancelAnimationFrame(raf);
-        // preserve remaining
-        duration = remaining;
-        page.classList.add("stopped");
-        startBtn.classList.add("stopped");
-        startBtn.textContent = "Start";
-      }
-
-      startBtn.addEventListener("click", () => {
-        if (running) stop();
-        else start();
-      });
-
-      // init
-      (function init() {
-        remaining = TOTAL;
-        duration = TOTAL;
-        timeEl.textContent = fmt(remaining);
-        timeEl.setAttribute("data-text", timeEl.textContent);
         updateRing();
-      })();
+        rafId = requestAnimationFrame(tick);
+      }
 
-      // responsive
-      window.addEventListener("resize", updateRing);
+      function startTimer() {
+        if (running) {
+          stopTimer();
+          return;
+        }
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        running = true;
+        endTime = performance.now() + remaining * 1000;
+        toggleBtn.textContent = "Stop";
+        toggleBtn.className = "stop";
+        document.body.classList.remove("green");
+        rafId = requestAnimationFrame(tick);
+      }
+      function stopTimer() {
+        running = false;
+        if (rafId) cancelAnimationFrame(rafId);
+        remaining = DURATION;
+        timeEl.textContent = formatTime(remaining);
+        timeEl.setAttribute("data-text", timeEl.textContent);
+        toggleBtn.textContent = "Start";
+        toggleBtn.className = "stop";
+        document.body.classList.add("green");
+        updateRing();
+      }
+
+      toggleBtn.addEventListener("click", startTimer);
+
+      // Init
+      timeEl.textContent = formatTime(DURATION);
+      timeEl.setAttribute("data-text", timeEl.textContent);
+      updateRing();
     </script>
   </body>
 </html>
